@@ -1,443 +1,464 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Интерактивный квиз - Загрузка JSON</title>
-  <style>
-    body {
-      background: linear-gradient(135deg, #74ebd5 0%, #acb6e5 100%);
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 100vh;
-      margin: 0;
-      padding: 20px;
-    }
-    .quiz-container {
-      background: #fff;
-      border-radius: 10px;
-      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
-      width: 100%;
-      max-width: 600px;
-      padding: 20px 30px;
-      position: relative;
-      overflow: hidden;
-    }
-    .progress-bar {
-      height: 10px;
-      background: #e0e0e0;
-      border-radius: 5px;
-      overflow: hidden;
-      margin-bottom: 20px;
-    }
-    .progress {
-      height: 100%;
-      background: #76c7c0;
-      width: 0%;
-      transition: width 0.5s ease;
-    }
-    h2 {
-      margin-top: 0;
-    }
-    .question-counter {
-      font-size: 1em;
-      color: #00796b;
-      margin-bottom: 10px;
-    }
-    .question {
-      font-size: 1.25em;
-      margin-bottom: 20px;
-    }
-    .options {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-    .option {
-      background: #f9f9f9;
-      border: 2px solid #f9f9f9;
-      border-radius: 5px;
-      padding: 10px 15px;
-      cursor: pointer;
-      transition: background 0.3s, border 0.3s, transform 0.3s;
-    }
-    .option:hover {
-      background: #e0f7fa;
-      transform: scale(1.02);
-    }
-    .option.selected {
-      border-color: #00796b;
-      background: #b2dfdb;
-    }
-    .btn {
-      display: block;
-      width: 100%;
-      padding: 12px;
-      margin-top: 20px;
-      border: none;
-      border-radius: 5px;
-      background: #00796b;
-      color: #fff;
-      font-size: 1em;
-      cursor: pointer;
-      transition: background 0.3s, transform 0.3s;
-    }
-    .btn:hover {
-      background: #004d40;
-      transform: scale(1.03);
-    }
-    .upload-area {
-      border: 2px dashed #00796b;
-      border-radius: 10px;
-      padding: 40px;
-      text-align: center;
-      color: #00796b;
-      cursor: pointer;
-      margin-bottom: 20px;
-      transition: background 0.3s, border 0.3s;
-    }
-    .upload-area.hover {
-      background: #e0f7fa;
-    }
-    .hidden {
-      display: none;
-    }
-    .modal {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0, 0, 0, 0.5);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      opacity: 0;
-      visibility: hidden;
-      transition: opacity 0.3s, visibility 0.3s;
-      z-index: 100;
-    }
-    .modal.active {
-      opacity: 1;
-      visibility: visible;
-    }
-    .modal-content {
-      background: #fff;
-      border-radius: 10px;
-      padding: 20px;
-      max-width: 400px;
-      text-align: center;
-      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-      animation: fadeIn 0.5s ease;
-    }
-    @keyframes fadeIn {
-      from {
-        opacity: 0;
-        filter: blur(5px);
-        transform: scale(0.95);
-      }
-      to {
-        opacity: 1;
-        filter: blur(0);
-        transform: scale(1);
-      }
-    }
-    @keyframes fadeOut {
-      from {
-        opacity: 1;
-        filter: blur(0);
-        transform: scale(1);
-      }
-      to {
-        opacity: 0;
-        filter: blur(5px);
-        transform: scale(0.95);
-      }
-    }
-    .fade-in {
-      animation: fadeIn 0.5s ease forwards;
-    }
-    .fade-out {
-      animation: fadeOut 0.5s ease forwards;
-    }
-  </style>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Интерактивный квиз - Выбор теста</title>
+    <style>
+        body {
+            background: linear-gradient(135deg, #74ebd5 0%, #acb6e5 100%);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+        .quiz-container {
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+            width: 100%;
+            max-width: 600px;
+            padding: 20px 30px;
+            position: relative;
+            overflow: hidden;
+            margin-top: 20px;
+        }
+        .progress-bar {
+            height: 10px;
+            background: #e0e0e0;
+            border-radius: 5px;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+        .progress {
+            height: 100%;
+            background: #76c7c0;
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+        h2 {
+            margin-top: 0;
+        }
+        .question-counter {
+            font-size: 1em;
+            color: #00796b;
+            margin-bottom: 10px;
+        }
+        .question {
+            font-size: 1.25em;
+            margin-bottom: 20px;
+        }
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .option {
+            background: #f9f9f9;
+            border: 2px solid #f9f9f9;
+            border-radius: 5px;
+            padding: 10px 15px;
+            cursor: pointer;
+            transition: background 0.3s, border 0.3s, transform 0.3s;
+        }
+        .option:hover {
+            background: #e0f7fa;
+            transform: scale(1.02);
+        }
+        .option.selected {
+            border-color: #00796b;
+            background: #b2dfdb;
+        }
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 12px;
+            margin-top: 20px;
+            border: none;
+            border-radius: 5px;
+            background: #00796b;
+            color: #fff;
+            font-size: 1em;
+            cursor: pointer;
+            transition: background 0.3s, transform 0.3s;
+        }
+        .btn:hover {
+            background: #004d40;
+            transform: scale(1.03);
+        }
+        .hidden {
+            display: none;
+        }
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s, visibility 0.3s;
+            z-index: 100;
+        }
+        .modal.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        .modal-content {
+            background: #fff;
+            border-radius: 10px;
+            padding: 20px;
+            max-width: 400px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            animation: fadeIn 0.5s ease;
+        }
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                filter: blur(5px);
+                transform: scale(0.95);
+            }
+            to {
+                opacity: 1;
+                filter: blur(0);
+                transform: scale(1);
+            }
+        }
+        @keyframes fadeOut {
+            from {
+                opacity: 1;
+                filter: blur(0);
+                transform: scale(1);
+            }
+            to {
+                opacity: 0;
+                filter: blur(5px);
+                transform: scale(0.95);
+            }
+        }
+        .fade-in {
+            animation: fadeIn 0.5s ease forwards;
+        }
+        .fade-out {
+            animation: fadeOut 0.5s ease forwards;
+        }
+        /* Стили для меню выбора теста */
+        .test-menu {
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+            width: 100%;
+            max-width: 600px;
+            padding: 20px 30px;
+            text-align: center;
+        }
+        .test-menu select, .test-menu button {
+            padding: 10px;
+            font-size: 1em;
+            margin-top: 10px;
+        }
+    </style>
 </head>
 <body>
-  <div class="quiz-container" id="quiz">
-    <!-- Область загрузки файла -->
-    <div id="upload-area" class="upload-area">
-      <p>Перетащите сюда JSON-файл с вопросами или кликните для выбора файла</p>
+<!-- Меню выбора теста -->
+<div class="test-menu" id="test-menu">
+    <h2>Выберите тест</h2>
+    <select id="test-selector">
+        <option value="" disabled selected>Загрузка списка тестов...</option>
+    </select>
+    <button class="btn" id="start-test-btn">Начать тест</button>
+</div>
+
+<!-- Контейнер квиза -->
+<div class="quiz-container hidden" id="quiz">
+    <div class="progress-bar" id="progress-bar">
+        <div class="progress" id="progress"></div>
     </div>
-    <!-- Скрытый input для выбора файла -->
-    <input type="file" id="file-input" class="hidden" accept=".json" />
-    <!-- Прогресс-бар (скрыт до загрузки файла) -->
-    <div class="progress-bar" id="progress-bar" style="display: none;">
-      <div class="progress" id="progress"></div>
-    </div>
-    <!-- Контент квиза -->
     <div id="quiz-content"></div>
-  </div>
+</div>
 
-  <!-- Модальное окно для отображения результата ответа -->
-  <div class="modal" id="modal">
+<!-- Модальное окно для отображения результата ответа -->
+<div class="modal" id="modal">
     <div class="modal-content">
-      <h3 id="modal-title"></h3>
-      <p id="modal-text"></p>
-      <button class="btn" id="modal-btn">Далее</button>
+        <h3 id="modal-title"></h3>
+        <p id="modal-text"></p>
+        <button class="btn" id="modal-btn">Далее</button>
     </div>
-  </div>
+</div>
 
-  <!-- Подключаем библиотеку для конфетти -->
-  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
-  <script>
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+<script>
     document.addEventListener('DOMContentLoaded', () => {
-      let quizData = null;
-      let currentQuestionIndex = 0;
-      let score = 0;
-      let selectedOption = null;
-      let lifelinesAvailable = 2; // Количество доступных lifeline (50/50)
-      let lifelineUsed = false;   // Использована ли подсказка в текущем вопросе
+        let quizData = null;
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let selectedOption = null;
+        let lifelinesAvailable = 2; // Количество доступных подсказок 50/50
+        let lifelineUsed = false;   // Использована ли подсказка в текущем вопросе
 
-      const quizContent = document.getElementById('quiz-content');
-      const progress = document.getElementById('progress');
-      const modal = document.getElementById('modal');
-      const modalTitle = document.getElementById('modal-title');
-      const modalText = document.getElementById('modal-text');
-      const modalBtn = document.getElementById('modal-btn');
-      const uploadArea = document.getElementById('upload-area');
-      const fileInput = document.getElementById('file-input');
+        const quizContent = document.getElementById('quiz-content');
+        const progress = document.getElementById('progress');
+        const modal = document.getElementById('modal');
+        const modalTitle = document.getElementById('modal-title');
+        const modalText = document.getElementById('modal-text');
+        const modalBtn = document.getElementById('modal-btn');
+        const quizContainer = document.getElementById('quiz');
 
-      const shuffle = (array) => {
-        for (let i = array.length - 1; i > 0; i--) {
-          const j = Math.floor(Math.random() * (i + 1));
-          [array[i], array[j]] = [array[j], array[i]];
-        }
-      };
+        // Элементы меню выбора теста
+        const testSelector = document.getElementById('test-selector');
+        const startTestBtn = document.getElementById('start-test-btn');
+        const testMenu = document.getElementById('test-menu');
 
-      const updateProgress = () => {
-        if (quizData && quizData.quiz && quizData.quiz.length > 0) {
-          const percent = (currentQuestionIndex / quizData.quiz.length) * 100;
-          progress.style.width = `${percent}%`;
-        }
-      };
+        // Функция для загрузки списка тестов из файла tests.json
+        const loadTestList = () => {
+            fetch('tests.json')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Не удалось загрузить список тестов');
+                    }
+                    return response.json();
+                })
+                .then(testList => {
+                    // Очищаем select и заполняем его объектами { file, name }
+                    testSelector.innerHTML = '<option value="" disabled selected>-- Выберите тест --</option>';
+                    testList.forEach(test => {
+                        const option = document.createElement('option');
+                        option.value = test.file;
+                        option.textContent = test.name;
+                        testSelector.appendChild(option);
+                    });
+                })
+                .catch(error => {
+                    alert('Ошибка при загрузке списка тестов: ' + error.message);
+                });
+        };
 
-      const useLifeline = (question, optionsContainer) => {
-        const optionElems = Array.from(optionsContainer.querySelectorAll('.option'));
-        const incorrectOptions = optionElems.filter(elem => {
-          const optionText = elem.textContent.replace(/^\d+\.\s*/, '');
-          return optionText !== question.correct_answer;
-        });
-        if (incorrectOptions.length <= 2) {
-          incorrectOptions.forEach(elem => elem.remove());
-        } else {
-          shuffle(incorrectOptions);
-          incorrectOptions.slice(0, 2).forEach(elem => elem.remove());
-        }
-      };
+        const shuffle = (array) => {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+        };
 
-      const renderQuestion = () => {
-        lifelineUsed = false;
-        selectedOption = null;
-        quizContent.innerHTML = '';
-        updateProgress();
+        const updateProgress = () => {
+            if (quizData && quizData.quiz && quizData.quiz.length > 0) {
+                const percent = (currentQuestionIndex / quizData.quiz.length) * 100;
+                progress.style.width = `${percent}%`;
+            }
+        };
 
-        if (currentQuestionIndex >= quizData.quiz.length) {
-          quizContent.innerHTML = `
+        const useLifeline = (question, optionsContainer) => {
+            const optionElems = Array.from(optionsContainer.querySelectorAll('.option'));
+            const incorrectOptions = optionElems.filter(elem => {
+                const optionText = elem.textContent.replace(/^\d+\.\s*/, '');
+                return optionText !== question.correct_answer;
+            });
+            if (incorrectOptions.length <= 2) {
+                incorrectOptions.forEach(elem => elem.remove());
+            } else {
+                shuffle(incorrectOptions);
+                incorrectOptions.slice(0, 2).forEach(elem => elem.remove());
+            }
+        };
+
+        const renderQuestion = () => {
+            lifelineUsed = false;
+            selectedOption = null;
+            quizContent.innerHTML = '';
+            updateProgress();
+
+            if (currentQuestionIndex >= quizData.quiz.length) {
+                quizContent.innerHTML = `
             <h2>Результаты</h2>
             <p>Вы ответили правильно на ${score} из ${quizData.quiz.length} вопросов.</p>
             <button class="btn" id="restart-btn">Пройти снова</button>
           `;
-          document.getElementById('restart-btn').onclick = initQuiz;
-          progress.style.width = '100%';
-          return;
-        }
-
-        const currentQuestion = quizData.quiz[currentQuestionIndex];
-
-        const topContainer = document.createElement('div');
-        topContainer.style.display = 'flex';
-        topContainer.style.justifyContent = 'space-between';
-        topContainer.style.alignItems = 'center';
-        topContainer.style.marginBottom = '10px';
-
-        const questionCounter = document.createElement('span');
-        questionCounter.className = 'question-counter';
-        questionCounter.textContent = `Вопрос ${currentQuestionIndex + 1} из ${quizData.quiz.length}`;
-        topContainer.appendChild(questionCounter);
-
-        const lifelineContainer = document.createElement('div');
-        const lifelineCountElem = document.createElement('span');
-        lifelineCountElem.textContent = `50/50 осталось: ${lifelinesAvailable}`;
-        lifelineContainer.appendChild(lifelineCountElem);
-
-        const optionsContainer = document.createElement('div');
-        optionsContainer.className = 'options';
-
-        if (lifelinesAvailable > 0 && currentQuestion.options.length > 2) {
-          const lifelineBtn = document.createElement('button');
-          lifelineBtn.className = 'btn';
-          lifelineBtn.style.width = 'auto';
-          lifelineBtn.style.padding = '8px 12px';
-          lifelineBtn.style.marginLeft = '10px';
-          lifelineBtn.textContent = '50/50';
-          lifelineBtn.onclick = () => {
-            if (!lifelineUsed) {
-              useLifeline(currentQuestion, optionsContainer);
-              lifelineUsed = true;
-              lifelinesAvailable--;
-              lifelineCountElem.textContent = `50/50 осталось: ${lifelinesAvailable}`;
-              lifelineBtn.disabled = true;
+                document.getElementById('restart-btn').onclick = initQuiz;
+                progress.style.width = '100%';
+                return;
             }
-          };
-          lifelineContainer.appendChild(lifelineBtn);
-        }
 
-        topContainer.appendChild(lifelineContainer);
-        quizContent.appendChild(topContainer);
+            const currentQuestion = quizData.quiz[currentQuestionIndex];
 
-        const questionElem = document.createElement('div');
-        questionElem.className = 'question';
-        questionElem.textContent = currentQuestion.question;
-        quizContent.appendChild(questionElem);
+            const topContainer = document.createElement('div');
+            topContainer.style.display = 'flex';
+            topContainer.style.justifyContent = 'space-between';
+            topContainer.style.alignItems = 'center';
+            topContainer.style.marginBottom = '10px';
 
-        currentQuestion.options.forEach((option, index) => {
-          const optionElem = document.createElement('div');
-          optionElem.className = 'option';
-          optionElem.textContent = `${index + 1}. ${option}`;
-          optionElem.tabIndex = 0;
-          optionElem.addEventListener('click', () => {
-            document.querySelectorAll('.option').forEach(opt => opt.classList.remove('selected'));
-            optionElem.classList.add('selected');
-            selectedOption = option;
-          });
-          optionsContainer.appendChild(optionElem);
-        });
-        quizContent.appendChild(optionsContainer);
+            const questionCounter = document.createElement('span');
+            questionCounter.className = 'question-counter';
+            questionCounter.textContent = `Вопрос ${currentQuestionIndex + 1} из ${quizData.quiz.length}`;
+            topContainer.appendChild(questionCounter);
 
-        const submitBtn = document.createElement('button');
-        submitBtn.className = 'btn';
-        submitBtn.textContent = 'Подтвердить';
-        submitBtn.addEventListener('click', handleSubmit);
-        quizContent.appendChild(submitBtn);
+            const lifelineContainer = document.createElement('div');
+            const lifelineCountElem = document.createElement('span');
+            lifelineCountElem.textContent = `50/50 осталось: ${lifelinesAvailable}`;
+            lifelineContainer.appendChild(lifelineCountElem);
 
-        quizContent.classList.remove('fade-out');
-        quizContent.classList.add('fade-in');
-        quizContent.addEventListener('animationend', () => {
-          quizContent.classList.remove('fade-in');
-        }, { once: true });
-      };
+            const optionsContainer = document.createElement('div');
+            optionsContainer.className = 'options';
 
-      const handleSubmit = () => {
-        if (!selectedOption) {
-          alert('Пожалуйста, выберите вариант ответа.');
-          return;
-        }
-        const currentQuestion = quizData.quiz[currentQuestionIndex];
-        const isCorrect = selectedOption === currentQuestion.correct_answer;
-        modalTitle.textContent = isCorrect ? 'Правильно!' : 'Неправильно!';
-        if (isCorrect) {
-          score++;
-          confetti({
-            particleCount: 100,
-            spread: 70,
-            origin: { y: 0.6 }
-          });
-        }
-        modalText.textContent = currentQuestion.explanation || '';
-        showModal();
-      };
-
-      const showModal = () => modal.classList.add('active');
-      const hideModal = () => modal.classList.remove('active');
-
-      const transitionToNextQuestion = () => {
-        quizContent.classList.add('fade-out');
-        quizContent.addEventListener('animationend', () => {
-          hideModal();
-          currentQuestionIndex++;
-          renderQuestion();
-          quizContent.classList.remove('fade-out');
-        }, { once: true });
-      };
-
-      modalBtn.onclick = () => transitionToNextQuestion();
-
-      const handleFile = (file) => {
-        const reader = new FileReader();
-        reader.onload = (e) => {
-          try {
-            const data = JSON.parse(e.target.result);
-            if (!data.quiz || !Array.isArray(data.quiz)) {
-              throw new Error('Неверный формат данных');
+            if (lifelinesAvailable > 0 && currentQuestion.options.length > 2) {
+                const lifelineBtn = document.createElement('button');
+                lifelineBtn.className = 'btn';
+                lifelineBtn.style.width = 'auto';
+                lifelineBtn.style.padding = '8px 12px';
+                lifelineBtn.style.marginLeft = '10px';
+                lifelineBtn.textContent = '50/50';
+                lifelineBtn.onclick = () => {
+                    if (!lifelineUsed) {
+                        useLifeline(currentQuestion, optionsContainer);
+                        lifelineUsed = true;
+                        lifelinesAvailable--;
+                        lifelineCountElem.textContent = `50/50 осталось: ${lifelinesAvailable}`;
+                        lifelineBtn.disabled = true;
+                    }
+                };
+                lifelineContainer.appendChild(lifelineBtn);
             }
-            quizData = data;
-            shuffle(quizData.quiz);
-            quizData.quiz.forEach(q => {
-              if (q.options && Array.isArray(q.options)) {
-                shuffle(q.options);
-              }
+
+            topContainer.appendChild(lifelineContainer);
+            quizContent.appendChild(topContainer);
+
+            const questionElem = document.createElement('div');
+            questionElem.className = 'question';
+            questionElem.textContent = currentQuestion.question;
+            quizContent.appendChild(questionElem);
+
+            currentQuestion.options.forEach((option, index) => {
+                const optionElem = document.createElement('div');
+                optionElem.className = 'option';
+                optionElem.textContent = `${index + 1}. ${option}`;
+                optionElem.tabIndex = 0;
+                optionElem.addEventListener('click', () => {
+                    document.querySelectorAll('.option').forEach(opt => opt.classList.remove('selected'));
+                    optionElem.classList.add('selected');
+                    selectedOption = option;
+                });
+                optionsContainer.appendChild(optionElem);
             });
-            uploadArea.style.display = 'none';
-            document.getElementById('progress-bar').style.display = 'block';
-            renderQuestion();
-          } catch (error) {
-            alert('Ошибка при разборе JSON-файла. Убедитесь, что файл имеет корректный формат.');
-          }
+            quizContent.appendChild(optionsContainer);
+
+            const submitBtn = document.createElement('button');
+            submitBtn.className = 'btn';
+            submitBtn.textContent = 'Подтвердить';
+            submitBtn.addEventListener('click', handleSubmit);
+            quizContent.appendChild(submitBtn);
+
+            quizContent.classList.remove('fade-out');
+            quizContent.classList.add('fade-in');
+            quizContent.addEventListener('animationend', () => {
+                quizContent.classList.remove('fade-in');
+            }, { once: true });
         };
-        reader.readAsText(file);
-      };
 
-      const initQuiz = () => {
-        quizData = null;
-        currentQuestionIndex = 0;
-        score = 0;
-        selectedOption = null;
-        lifelinesAvailable = 2;
-        uploadArea.style.display = 'block';
-        document.getElementById('progress-bar').style.display = 'none';
-        quizContent.innerHTML = '';
-      };
-
-      uploadArea.addEventListener('click', () => fileInput.click());
-      fileInput.addEventListener('change', (event) => {
-        const file = event.target.files[0];
-        if (file) handleFile(file);
-      });
-      uploadArea.addEventListener('dragover', (event) => {
-        event.preventDefault();
-        uploadArea.classList.add('hover');
-      });
-      uploadArea.addEventListener('dragleave', (event) => {
-        event.preventDefault();
-        uploadArea.classList.remove('hover');
-      });
-      uploadArea.addEventListener('drop', (event) => {
-        event.preventDefault();
-        uploadArea.classList.remove('hover');
-        const file = event.dataTransfer.files[0];
-        if (file) handleFile(file);
-      });
-
-      document.addEventListener('keydown', (event) => {
-        if (modal.classList.contains('active')) return;
-        const options = document.querySelectorAll('.option');
-        if (options.length > 0) {
-          const key = event.key;
-          if (!isNaN(key)) {
-            const index = parseInt(key, 10) - 1;
-            if (index >= 0 && index < options.length) {
-              options.forEach(opt => opt.classList.remove('selected'));
-              options[index].classList.add('selected');
-              selectedOption = options[index].textContent.replace(/^\d+\.\s*/, '');
+        const handleSubmit = () => {
+            if (!selectedOption) {
+                alert('Пожалуйста, выберите вариант ответа.');
+                return;
             }
-          } else if (key === 'Enter') {
-            handleSubmit();
-          }
-        }
-      });
+            const currentQuestion = quizData.quiz[currentQuestionIndex];
+            const isCorrect = selectedOption === currentQuestion.correct_answer;
+            modalTitle.textContent = isCorrect ? 'Правильно!' : 'Неправильно!';
+            if (isCorrect) {
+                score++;
+                confetti({
+                    particleCount: 100,
+                    spread: 70,
+                    origin: { y: 0.6 }
+                });
+            }
+            modalText.textContent = currentQuestion.explanation || '';
+            showModal();
+        };
+
+        const showModal = () => modal.classList.add('active');
+        const hideModal = () => modal.classList.remove('active');
+
+        const transitionToNextQuestion = () => {
+            quizContent.classList.add('fade-out');
+            quizContent.addEventListener('animationend', () => {
+                hideModal();
+                currentQuestionIndex++;
+                renderQuestion();
+                quizContent.classList.remove('fade-out');
+            }, { once: true });
+        };
+
+        modalBtn.onclick = () => transitionToNextQuestion();
+
+        const initQuiz = () => {
+            quizData = null;
+            currentQuestionIndex = 0;
+            score = 0;
+            selectedOption = null;
+            lifelinesAvailable = 2;
+            testMenu.classList.remove('hidden');
+            quizContainer.classList.add('hidden');
+        };
+
+        startTestBtn.addEventListener('click', () => {
+            const selectedTestFile = testSelector.value;
+            if (!selectedTestFile) {
+                alert('Пожалуйста, выберите тест.');
+                return;
+            }
+            fetch(selectedTestFile)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Не удалось загрузить тест');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (!data.quiz || !Array.isArray(data.quiz)) {
+                        throw new Error('Неверный формат данных теста');
+                    }
+                    quizData = data;
+                    testMenu.classList.add('hidden');
+                    quizContainer.classList.remove('hidden');
+                    shuffle(quizData.quiz);
+                    quizData.quiz.forEach(q => {
+                        if (q.options && Array.isArray(q.options)) {
+                            shuffle(q.options);
+                        }
+                    });
+                    renderQuestion();
+                })
+                .catch(error => {
+                    alert('Ошибка при загрузке теста: ' + error.message);
+                });
+        });
+
+        document.addEventListener('keydown', (event) => {
+            if (modal.classList.contains('active')) return;
+            const options = document.querySelectorAll('.option');
+            if (options.length > 0) {
+                const key = event.key;
+                if (!isNaN(key)) {
+                    const index = parseInt(key, 10) - 1;
+                    if (index >= 0 && index < options.length) {
+                        options.forEach(opt => opt.classList.remove('selected'));
+                        options[index].classList.add('selected');
+                        selectedOption = options[index].textContent.replace(/^\d+\.\s*/, '');
+                    }
+                } else if (key === 'Enter') {
+                    handleSubmit();
+                }
+            }
+        });
+
+        loadTestList();
     });
-  </script>
+</script>
 </body>
 </html>
